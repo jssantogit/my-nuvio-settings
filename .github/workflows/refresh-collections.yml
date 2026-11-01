@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: '15 6 1 * *'
   workflow_dispatch:
+  push:
+    paths:
+      - collections.json
+      - scripts/refresh-collections.mjs
+      - tests/refresh-collections.test.mjs
+      - .github/workflows/refresh-collections.yml
 
 permissions:
   contents: write
@@ -23,10 +29,12 @@ jobs:
       - name: Verificar testes antes da atualização
         run: node --test tests/refresh-collections.test.mjs
       - name: Atualizar filtros de datas no JSON
+        if: github.event_name != 'push'
         run: node scripts/refresh-collections.mjs collections.json
       - name: Verificar testes depois da atualização
         run: node --test tests/refresh-collections.test.mjs
       - name: Publicar JSON se alterado
+        if: github.event_name != 'push'
         run: |
           if ! git diff --quiet -- collections.json; then
             git config user.name 'github-actions[bot]'
