@@ -27,12 +27,12 @@ jobs:
         with:
           node-version: '22'
       - name: Verificar testes antes da atualização
-        run: node --test tests/refresh-collections.test.mjs
+        run: node --test tests/*.test.mjs
       - name: Atualizar filtros de datas no JSON
         if: github.event_name != 'push'
         run: node scripts/refresh-collections.mjs collections.json
       - name: Verificar testes depois da atualização
-        run: node --test tests/refresh-collections.test.mjs
+        run: node --test tests/*.test.mjs
       - name: Publicar JSON se alterado
         if: github.event_name != 'push'
         run: |
