@@ -10,13 +10,13 @@ const folder=(data,hub,id)=>data.find(h=>h.id===hub).folders.find(f=>f.id===id);
 test('Season dates track the current quarter',()=>{
  const d=refreshCollections(copy(),'2027-01-05');
  const s=folder(d,'hub-anime','anime-current-season');
- assert.equal(s.sources[0].filters.releaseDateGte,'2027-01-01');
- assert.equal(s.sources[0].filters.releaseDateLte,'2027-03-31');
- assert.equal(s.sources[2].title,'Filmes de 2027');
+ assert.equal(s.sources.find(x=>x.provider==='tmdb').filters.releaseDateGte,'2027-01-01');
+ assert.equal(s.sources.find(x=>x.provider==='tmdb').filters.releaseDateLte,'2027-03-31');
+ assert.equal(s.sources.filter(x=>x.provider==='tmdb')[2].title,'Filmes de 2027');
 });
 test('Upcoming releases begin after today',()=>{
  const d=refreshCollections(copy(),'2027-01-05');
- for(const s of folder(d,'hub-anime','anime-upcoming').sources)
+ for(const s of folder(d,'hub-anime','anime-upcoming').sources.filter(x=>x.provider==='tmdb'))
   assert.equal(s.filters.releaseDateGte,'2027-01-06');
 });
 test('New doramas include five countries, plus broadcaster tvN',()=>{
@@ -42,4 +42,14 @@ test('Updater is idempotent and never restores old cover URLs',()=>{
  const b=refreshCollections(a,'2027-01-05');
  assert.deepEqual(a,b);
  assert.ok(!JSON.stringify(a).includes('jssantogit/nuvio-covers/'));
+});
+
+test('Refresh retains optional AIO episode catalogs and changes only TMDB date filters',()=>{
+ const data=refreshCollections(copy(),'2027-04-05');
+ const seasonal=folder(data,'hub-anime','anime-current-season');
+ assert(seasonal.sources.some(s=>s.provider==='addon'&&s.catalogId==='seasonal'));
+ assert.equal(seasonal.sources.find(s=>s.provider==='tmdb').filters.releaseDateGte,'2027-04-01');
+ const upcoming=folder(data,'hub-anime','anime-upcoming');
+ assert(upcoming.sources.some(s=>s.provider==='addon'&&s.catalogId==='seasonal'));
+ assert(upcoming.sources.filter(s=>s.provider==='tmdb').every(s=>s.filters.releaseDateGte==='2027-04-06'));
 });
