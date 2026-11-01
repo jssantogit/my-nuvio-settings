@@ -21,11 +21,12 @@ export function refreshCollections(data,today){
  find("hub-discover","discover-weekly-top").title="Destaques e rankings";
  find("hub-discover","discover-streaming-new").title="Destaques do streaming";
  const seas=find("hub-anime","anime-current-season");seas.title="Temporada de anime atual";
- for(let i=0;i<2;i++)win(seas.sources[i],quarterStart,quarterEnd,i===0?null:3);
- const movie=seas.sources[2];movie.title=`Filmes de ${year}`;win(movie,`${year}-01-01`,`${year}-12-31`);
- if(!seas.sources.some(s=>s.title==="Estreias da temporada"))seas.sources.push(cp(seas.sources[0],"Estreias da temporada"));
+ const seasonTmdb=seas.sources.filter(s=>s.provider==='tmdb');
+ for(let i=0;i<2;i++)win(seasonTmdb[i],quarterStart,quarterEnd,i===0?null:3);
+ const movie=seasonTmdb[2];movie.title=`Filmes de ${year}`;win(movie,`${year}-01-01`,`${year}-12-31`);
+ if(!seas.sources.some(s=>s.title==="Estreias da temporada"))seas.sources.push(cp(seasonTmdb[0],"Estreias da temporada"));
  const ss=seas.sources.find(s=>s.title==="Estreias da temporada");ss.sortBy="first_air_date.desc";win(ss,quarterStart,today<quarterEnd?today:quarterEnd);
- for(const s of find("hub-anime","anime-upcoming").sources)win(s,coming,upTo);
+ for(const s of find("hub-anime","anime-upcoming").sources.filter(s=>s.provider==='tmdb'))win(s,coming,upTo);
  const se=find("hub-series","series-airing");se.title="Séries novas e populares";win(se.sources[0],dateOffset(today,-120),today);
  for(const id of ["asia-kdramas","asia-jdramas","asia-cdramas"]){const s=find("hub-asia",id).sources[0];win(s,dateOffset(today,-120),today);s.filters.withGenres=null;s.filters.withoutGenres="16";}
  const asia=data.find(h=>h.id==="hub-asia");
