@@ -4,6 +4,9 @@
 
 | Coleção | Critério do JSON | Limitação |
 | --- | --- | --- |
+| Episódios em exibição (séries) | AIO Metadata: TMDB Airing Today e TVMaze Daily Schedule | Necessita addon instalado; mostra transmissões programadas, não necessariamente novidades do streaming |
+| Anime · episódios em exibição | Nuvio Anime & Kids: Recently Aired / Latest Episodes / Airing Today | Precisa de addon instalado e hospedado; nem todo episódio lançado possui arquivo disponível |
+| Temporada de anime (fonte especializada) | Nuvio Anime & Kids: Seasonal Anime | AniList separa temporadas/continuações, mas a cobertura depende do addon |
 | Novos animes / séries | TV japonesa com gênero Animação (16), língua japonesa, origem JP, **primeira estreia** nos últimos 120 dias, sem mínimo de votos | Temporadas novas de anime antigo podem não aparecer |
 | Novos animes / filmes | Filme japonês animado, lançamento nos últimos 180 dias | Datas da TMDB podem refletir cinema, não estreia em streaming |
 | Temporada de anime atual | Séries animadas que estrearam no trimestre corrente | É trimestre de estreia; não é lista de episódios novos |
@@ -34,6 +37,12 @@ O arquivo [`xperience_korean_collection.json`](https://github.com/eichicionizuka
 
 ## Como avaliar a qualidade
 
-Verifique na prática títulos recentes conhecidos de **cada país**; se faltarem, investigue o cadastro TMDB (data de primeira estreia, idioma original, país de origem, gênero e emissora). Isso não pode ser diagnosticado só pelo JSON. A TMDB Discover não fornece, nesta configuração, um calendário completo de novos episódios, temporadas sequenciais ou disponibilidade real de streaming. Para isso seria necessária fonte própria de temporadas/episódios (por exemplo um addon) e testes com dados reais.
+Verifique na prática títulos recentes conhecidos de **cada país**; se faltarem, investigue o cadastro TMDB (data de primeira estreia, idioma original, país de origem, gênero e emissora). Isso não pode ser diagnosticado só pelo JSON. A TMDB Discover não fornece, nesta configuração, um calendário completo de novas temporadas/episódios. Foram adicionadas fontes externas que podem suprir essa lacuna quando os addons estiverem instalados; elas não foram testadas dentro do Nuvio do usuário. O acesso efetivo a streams, legendas e distribuição no Brasil continua independente da listagem.
 
 Capas: imagens já existentes em [`covers/`](../covers/) e URLs apontando para este repositório. Algumas imagens externas permanecem intocadas.
+
+## Taxonomia de anime
+
+Shounen, Seinen, Shoujo, Josei e Isekai não são equivalentes a Drama/Ação/Fantasia da TMDB. Até haver catálogos AniList reais configurados em uma instância AIO, as pastas antigas permanecem como **aproximação temática** — não como classificação autêntica. O guia [INTEGRACOES.md](./INTEGRACOES.md) documenta a validação dos IDs reais, receitas de filtros e como substituir essas sugestões sem criar IDs falsos.
+
+A API pública Jikan usada por alguns catálogos MAL encerrou-se em outubro de 2026. Não foram adicionadas novas dependências dela. AIO Metadata pode fornecer catálogos via AniList, desde que configurados e instalados.
