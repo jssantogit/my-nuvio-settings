@@ -64,6 +64,6 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const next=refreshCollections(data,today);
   const ids=next.flatMap(h=>h.folders.map(f=>f.id));
   if(new Set(ids).size!==ids.length)throw Error('Duplicate folder IDs');
-  writeFileSync(path,JSON.stringify(next,null,1)+'\\n');
+  writeFileSync(path,JSON.stringify(next,null,1)+'\n');
   console.log('Refreshed',today,'hubs:',next.length,'folders:',ids.length);
 }
