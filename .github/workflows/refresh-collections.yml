@@ -1,0 +1,37 @@
+name: Atualizar janelas de lançamentos Nuvio
+
+on:
+  schedule:
+    - cron: '15 6 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-nuvio-collections
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar testes antes da atualização
+        run: node --test tests/refresh-collections.test.mjs
+      - name: Atualizar filtros de datas no JSON
+        run: node scripts/refresh-collections.mjs collections.json
+      - name: Verificar testes depois da atualização
+        run: node --test tests/refresh-collections.test.mjs
+      - name: Publicar JSON se alterado
+        run: |
+          if ! git diff --quiet -- collections.json; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add collections.json
+            git commit -m 'chore: refresh Nuvio release windows'
+            git push
+          fi
