@@ -7722,6 +7722,36 @@
   "title": "Séries",
   "folders": [
    {
+    "id": "series-episode-schedule",
+    "title": "Episódios em exibição",
+    "sources": [
+     {
+      "provider": "addon",
+      "addonId": "aio-metadata",
+      "type": "series",
+      "catalogId": "tmdb.airing_today",
+      "genre": null
+     },
+     {
+      "provider": "addon",
+      "addonId": "aio-metadata",
+      "type": "series",
+      "catalogId": "tvmaze.schedule",
+      "genre": null
+     }
+    ],
+    "hideTitle": false,
+    "tileShape": "LANDSCAPE",
+    "coverEmoji": null,
+    "focusGifUrl": null,
+    "heroVideoUrl": null,
+    "titleLogoUrl": null,
+    "coverImageUrl": "https://raw.githubusercontent.com/jssantogit/my-nuvio-settings/main/covers/series/series-airing-v2.webp",
+    "catalogSources": [],
+    "focusGifEnabled": false,
+    "heroBackdropUrl": "https://raw.githubusercontent.com/jssantogit/my-nuvio-settings/main/covers/category-heroes/hero-series-v1.webp"
+   },
+   {
     "id": "series-airing",
     "title": "Séries novas e populares",
     "sources": [
@@ -9545,6 +9575,43 @@
   "title": "Anime",
   "folders": [
    {
+    "id": "anime-episode-schedule",
+    "title": "Anime · episódios em exibição",
+    "sources": [
+     {
+      "provider": "addon",
+      "addonId": "community.nuvio.animekids",
+      "type": "series",
+      "catalogId": "recently-aired",
+      "genre": null
+     },
+     {
+      "provider": "addon",
+      "addonId": "community.nuvio.animekids",
+      "type": "series",
+      "catalogId": "latest-episodes",
+      "genre": null
+     },
+     {
+      "provider": "addon",
+      "addonId": "community.nuvio.animekids",
+      "type": "series",
+      "catalogId": "airing-today",
+      "genre": null
+     }
+    ],
+    "hideTitle": false,
+    "tileShape": "LANDSCAPE",
+    "coverEmoji": null,
+    "focusGifUrl": null,
+    "heroVideoUrl": null,
+    "titleLogoUrl": "https://cdn.xperience-app.com/covers/default/anime.airing_now.logo.webp?v=4",
+    "coverImageUrl": "https://raw.githubusercontent.com/jssantogit/my-nuvio-settings/main/covers/anime/anime-current-season-v1.webp",
+    "catalogSources": [],
+    "focusGifEnabled": false,
+    "heroBackdropUrl": "https://raw.githubusercontent.com/jssantogit/my-nuvio-settings/main/covers/category-heroes/hero-anime-v1.webp"
+   },
+   {
     "id": "anime-new-releases",
     "title": "Novos animes",
     "sources": [
@@ -9632,6 +9699,13 @@
     "id": "anime-current-season",
     "title": "Temporada de anime atual",
     "sources": [
+     {
+      "provider": "addon",
+      "addonId": "community.nuvio.animekids",
+      "type": "series",
+      "catalogId": "seasonal",
+      "genre": "This season"
+     },
      {
       "type": null,
       "genre": null,
@@ -9785,6 +9859,13 @@
     "title": "Próximos lançamentos",
     "sources": [
      {
+      "provider": "addon",
+      "addonId": "community.nuvio.animekids",
+      "type": "series",
+      "catalogId": "seasonal",
+      "genre": "Next season"
+     },
+     {
       "type": null,
       "genre": null,
       "title": "Próximas estreias",
@@ -9868,6 +9949,13 @@
     "id": "anime-popular",
     "title": "Mais populares",
     "sources": [
+     {
+      "provider": "addon",
+      "addonId": "aio-metadata",
+      "type": "anime",
+      "catalogId": "anilist.trending",
+      "genre": null
+     },
      {
       "type": null,
       "genre": null,
@@ -10170,7 +10258,7 @@
    },
    {
     "id": "anime-shounen",
-    "title": "Shounen",
+    "title": "Shounen — aproximação temática",
     "sources": [
      {
       "type": null,
@@ -10322,7 +10410,7 @@
    },
    {
     "id": "anime-seinen",
-    "title": "Seinen",
+    "title": "Seinen — aproximação temática",
     "sources": [
      {
       "type": null,
@@ -10474,7 +10562,7 @@
    },
    {
     "id": "anime-shoujo-josei",
-    "title": "Shoujo e josei",
+    "title": "Shoujo e josei — aproximação temática",
     "sources": [
      {
       "type": null,
@@ -10626,7 +10714,7 @@
    },
    {
     "id": "anime-isekai-fantasy",
-    "title": "Isekai e fantasia",
+    "title": "Isekai e fantasia — aproximação temática",
     "sources": [
      {
       "type": null,
