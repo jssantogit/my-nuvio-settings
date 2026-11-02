@@ -10,7 +10,7 @@ Na página de [coleções do Nuvio](https://nuvio.tv/account?tab=collections), u
 
 ## Organização
 
-- `collections.json` — 13 categorias principais, 175 subcoleções e 744 fontes, com datas iniciais de 01/11/2026.
+- `collections.json` — 13 categorias principais, 173 subcoleções e 736 fontes, com datas iniciais de 01/11/2026.
 - `covers/` — capas e fundos existentes; os caminhos e nomes foram preservados.
 - `scripts/refresh-collections.mjs` — renova datas de temporada, recentes e próximos lançamentos.
 - `tests/` — testes de regressão dos filtros e estrutura.
@@ -23,11 +23,15 @@ Na página de [coleções do Nuvio](https://nuvio.tv/account?tab=collections), u
 
 Os catálogos consultam TMDB/Trakt para obter os títulos, mas **as datas de filtro são valores fixos no JSON importado**. O repositório renova o JSON mensalmente; para acompanhar essas novas janelas, é necessário **importá-lo novamente no Nuvio**. A mudança no GitHub sozinha não altera a configuração que já está na conta.
 
-### Requisitos das novas fontes
+### Compatibilidade com os addons instalados
 
-A configuração inclui fontes de episódios de **AIO Metadata** (ID `aio-metadata`) e do addon **Nuvio Anime & Kids** (ID `community.nuvio.animekids`). O JSON é importável mesmo sem os addons, mas essas fontes não renderizam até que o addon correspondente esteja instalado e o catálogo esteja habilitado no Nuvio. O segundo addon precisa de uma instância acessível (é auto-hospedável). Não há instância pessoal presumida.
+Em 01/11/2026, foi conferido o manifesto configurado pelo usuário para AIO Metadata 3.8.3: tem ID `aio-metadata`, mas expõe **9 catálogos**, nenhum deles `tmdb.airing_today`, `tvmaze.schedule` ou `anilist.trending`. Por isso a configuração publicada **não contém** essas fontes nem depende do Nuvio Anime & Kids.
 
-As categorias Shounen, Seinen, Shoujo/Josei e Isekai continuam marcadas como **aproximações temáticas** enquanto não houver IDs reais de catálogos AniList personalizados. O script só instala um catálogo de demografia depois de verificar sua presença no manifesto do AIO. Veja [o guia de integração](./docs/INTEGRACOES.md).
+A atualização anterior havia incluído fontes existentes no código dos addons, mas **ausentes do manifesto efetivamente instalado**. Essa diferença gerou abas quebradas no Nuvio. O script `scripts/enhance-collections.mjs` agora só adiciona catálogos quando um **manifesto local real** comprova ID e tipo. Nenhum URL privado, token ou identificador individual do usuário é armazenado no repositório.
+
+Categorias de anime exibem títulos curtos (por exemplo, `Shounen`, `Seinen`, `Shoujo e josei` e `Isekai e fantasia`). A qualidade e as limitações das classificações TMDB permanecem documentadas, nunca no título da pasta.
+
+Leia [Integrações](./docs/INTEGRACOES.md) para habilitar fontes externas opcionais, se elas passarem a constar do seu manifesto.
 
 ### Principais melhorias
 
@@ -35,8 +39,8 @@ As categorias Shounen, Seinen, Shoujo/Josei e Isekai continuam marcadas como **a
 - Seção específica de novos doramas (Coreia, Japão, China, Taiwan, Tailândia e tvN) e novos animes.
 - Temporada de anime calculada por trimestre; futuros lançamentos começam após a data atual.
 - Renomeadas seções cujo título prometia atualidade ou ranking semanal não comprovado.
-- Nova seção de episódios em exibição para séries; calendário de anime e temporada sazonal com fontes verificadas de addon.
-- Nenhum `catalogId` de demografia foi inventado; fontes aproximadas ficam explicitamente identificadas.
+- Catálogos de episódios de addons passam a ser opcionais e só podem ser adicionados após validar o manifesto real da instalação.
+- Nenhum `catalogId` de demografia foi inventado; os rótulos visuais continuam curtos e as ressalvas ficam na documentação.
 - URLs das capas do antigo `nuvio-covers` trocadas pelas imagens existentes neste repositório.
 
 > A TMDB usa principalmente a **primeira data de estreia da série**, não o calendário de temporadas/episódios novos. Consulte [CURADORIA](./docs/CURADORIA.md) para limites e possíveis melhorias futuras.

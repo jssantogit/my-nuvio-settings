@@ -1,58 +1,93 @@
-// Adds validated episode catalogs and optional custom AniList taxonomy sources.
-// External addon catalogs require users to install and enable the referenced addon.
+// Keep Nuvio collection imports compatible with manifests actually installed.
+// Never publish a catalog reference merely because an upstream project supports it.
 import {readFileSync,writeFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
-export function enhanceCollections(data,options={}){
- const folder=(hub,id)=>{const h=data.find(h=>h.id===hub);if(!h)throw Error(`Hub ausente: ${hub}`);const f=h.folders.find(f=>f.id===id);if(!f)throw Error(`Pasta ausente: ${id}`);return f;};
- const ensure=(hub,id,title,fromId)=>{const h=data.find(h=>h.id===hub);let f=h.folders.find(f=>f.id===id);if(!f){f=JSON.parse(JSON.stringify(folder(hub,fromId)));f.id=id;f.title=title;f.sources=[];f.catalogSources=[];h.folders.splice(h.folders.findIndex(x=>x.id===fromId),0,f);}return f;};
- const add=(f,addonId,type,catalogId,genre=null)=>{if(!f.sources.some(s=>s.provider==='addon'&&s.addonId===addonId&&s.type===type&&s.catalogId===catalogId&&s.genre===genre))f.sources.unshift({provider:'addon',addonId,type,catalogId,genre});};
- const aio='aio-metadata',nuvioAnime='community.nuvio.animekids';
- const tv=ensure('hub-series','series-episode-schedule','Episódios em exibição','series-airing');
- add(tv,aio,'series','tvmaze.schedule');
- add(tv,aio,'series','tmdb.airing_today');
- const an=ensure('hub-anime','anime-episode-schedule','Anime · episódios em exibição','anime-new-releases');
- // Append, not unshift: order matters (recently aired > latest episodes > today).
- for(const id of ['recently-aired','latest-episodes','airing-today'])if(!an.sources.some(s=>s.provider==='addon'&&s.catalogId===id&&s.addonId===nuvioAnime))an.sources.push({provider:'addon',addonId:nuvioAnime,type:'series',catalogId:id,genre:null});
- add(folder('hub-anime','anime-current-season'),nuvioAnime,'series','seasonal','This season');
- add(folder('hub-anime','anime-upcoming'),nuvioAnime,'series','seasonal','Next season');
- add(folder('hub-anime','anime-popular'),aio,'anime','anilist.trending');
- const affected={
+
+export function enhanceCollections(data,options={}) {
+ const aioId='aio-metadata';
+ const animeId='community.nuvio.animekids';
+ const aio=options.manifest;
+ const anime=options.animeManifest;
+ const findHub=(id)=>{const h=data.find(x=>x.id===id);if(!h)throw Error('Hub ausente: '+id);return h;};
+ const folder=(hub,id)=>{const f=findHub(hub).folders.find(x=>x.id===id);if(!f)throw Error('Pasta ausente: '+id);return f;};
+ const available=(manifest,expectedId,type,catalogId)=>{
+  if(!manifest)return false;
+  if(manifest.id!==expectedId)throw Error('Manifest de addon errado: '+manifest.id+' (esperado '+expectedId+')');
+  if(!Array.isArray(manifest.catalogs))throw Error('Manifest sem catalogos validos');
+  return manifest.catalogs.some(c=>c.id===catalogId&&c.type===type);
+ };
+ const injected = {
+  [aioId]:new Set(['tmdb.airing_today','tvmaze.schedule','anilist.trending']),
+  [animeId]:new Set(['recently-aired','latest-episodes','airing-today','seasonal'])
+ };
+ // Remove previous optional sources first. Re-add only when the *configured* manifest proves they exist.
+ for(const h of data)for(const f of h.folders){
+  f.sources=f.sources.filter(s=>!(s.provider==='addon'&&injected[s.addonId]?.has(s.catalogId)));
+ }
+ for(const [hub,id] of [['hub-series','series-episode-schedule'],['hub-anime','anime-episode-schedule']]){
+  const h=findHub(hub);
+  h.folders=h.folders.filter(f=>f.id!==id||f.sources.length>0);
+ }
+ const ensureFolder=(hub,id,title,fromId)=>{
+  const h=findHub(hub);let f=h.folders.find(x=>x.id===id);
+  if(!f){
+   f=structuredClone(folder(hub,fromId));
+   f.id=id;f.title=title;f.sources=[];f.catalogSources=[];
+   h.folders.splice(h.folders.findIndex(x=>x.id===fromId),0,f);
+  }
+  return f;
+ };
+ const attach=(f,id,type,catalog,genre=null)=>{
+  if(!f.sources.some(s=>s.provider==='addon'&&s.addonId===id&&s.type===type&&s.catalogId===catalog&&s.genre===genre))
+   f.sources.push({provider:'addon',addonId:id,type,catalogId:catalog,genre});
+ };
+ if(available(aio,aioId,'series','tmdb.airing_today'))
+  attach(ensureFolder('hub-series','series-episode-schedule','Episódios em exibição','series-airing'),aioId,'series','tmdb.airing_today');
+ if(available(aio,aioId,'series','tvmaze.schedule'))
+  attach(ensureFolder('hub-series','series-episode-schedule','Episódios em exibição','series-airing'),aioId,'series','tvmaze.schedule');
+ if(available(aio,aioId,'anime','anilist.trending'))
+  attach(folder('hub-anime','anime-popular'),aioId,'anime','anilist.trending');
+ for(const [catalog,title] of [['recently-aired','Recém-exibidos'],['latest-episodes','Últimos episódios'],['airing-today','Hoje']]){
+  if(available(anime,animeId,'series',catalog)){
+   const f=ensureFolder('hub-anime','anime-episode-schedule','Episódios de anime','anime-new-releases');
+   attach(f,animeId,'series',catalog);
+  }
+ }
+ if(available(anime,animeId,'series','seasonal')){
+  attach(folder('hub-anime','anime-current-season'),animeId,'series','seasonal','This season');
+  attach(folder('hub-anime','anime-upcoming'),animeId,'series','seasonal','Next season');
+ }
+ const names={
   'anime-shounen':'Shounen',
   'anime-seinen':'Seinen',
   'anime-shoujo-josei':'Shoujo e josei',
   'anime-isekai-fantasy':'Isekai e fantasia'
  };
- for(const [id,label] of Object.entries(affected)) {
-  const f=folder('hub-anime',id);
-  if(!options.catalogMap?.[id]) f.title=label+' — aproximação temática';
- }
- const catalogMap=options.catalogMap||{};
- const entries=Object.entries(catalogMap).filter(([,id])=>typeof id==='string'&&id.trim());
- if(entries.length){
-  if(!options.manifest||!Array.isArray(options.manifest.catalogs))throw Error('Manifest AIO real é obrigatório para validar catalogIds');
-  if(options.manifest.id!==aio)throw Error('Manifest incorreto: addonId não é aio-metadata');
-  for(const [folderId,catalogId] of entries){
-   if(!(folderId in affected))throw Error('Pasta de taxonomia inválida: '+folderId);
-   if(!/^anilist\.discover\.[a-zA-Z0-9._~-]+$/.test(catalogId))throw Error('ID AniList Discover inválido: '+catalogId);
-   if(!options.manifest.catalogs.some(x=>x.id===catalogId&&x.type==='anime'))throw Error(`Catálogo ausente no manifest AIO: ${catalogId}`);
-   const f=folder('hub-anime',folderId);
-   f.title=affected[folderId];
-   f.sources=[{provider:'addon',addonId:aio,type:'anime',catalogId,genre:null}];
-  }
+ for(const [id,title] of Object.entries(names))folder('hub-anime',id).title=title;
+ for(const [id,catalogId] of Object.entries(options.catalogMap||{})){
+  if(typeof catalogId!=='string'||!catalogId.trim())continue;
+  if(!(id in names))throw Error('Pasta desconhecida: '+id);
+  if(!/^anilist\.discover\.[a-zA-Z0-9._~-]+$/.test(catalogId))throw Error('catalogId AniList inválido: '+catalogId);
+  if(!available(aio,aioId,'anime',catalogId))throw Error('Catálogo ausente no manifest AIO: '+catalogId);
+  folder('hub-anime',id).sources=[{provider:'addon',addonId:aioId,type:'anime',catalogId,genre:null}];
  }
  const ids=data.flatMap(h=>h.folders.map(f=>f.id));
- if(new Set(ids).size!==ids.length)throw Error('IDs duplicados');
+ if(new Set(ids).size!==ids.length)throw Error('Ids de pasta duplicados');
  return data;
 }
-if (process.argv[1] && fileURLToPath(import.meta.url)===process.argv[1]) {
+
+if(process.argv[1]&&fileURLToPath(import.meta.url)===process.argv[1]){
  const path=process.argv[2]||'collections.json';
  const manifestPath=process.argv[3];
  const mapPath=process.argv[4];
- if(Boolean(manifestPath)!==Boolean(mapPath))throw Error('Forneça juntos manifest.json e catalog-map.json');
- const manifest=manifestPath?JSON.parse(readFileSync(manifestPath,'utf8')):undefined;
- const catalogMap=mapPath?JSON.parse(readFileSync(mapPath,'utf8')):undefined;
- const original=JSON.parse(readFileSync(path,'utf8'));
- const updated=enhanceCollections(original,{manifest,catalogMap});
- writeFileSync(path,JSON.stringify(updated,null,1)+'\n');
- console.log('Updated catalogs:',updated.reduce((n,h)=>n+h.folders.length,0),'folders');
+ const animeManifestPath=process.argv[5];
+ if(mapPath&&!manifestPath)throw Error('Catálogos AniList precisam do manifest AIO');
+ const options={
+  manifest:manifestPath?JSON.parse(readFileSync(manifestPath,'utf8')):undefined,
+  catalogMap:mapPath?JSON.parse(readFileSync(mapPath,'utf8')):undefined,
+  animeManifest:animeManifestPath?JSON.parse(readFileSync(animeManifestPath,'utf8')):undefined
+ };
+ const result=enhanceCollections(JSON.parse(readFileSync(path,'utf8')),options);
+ writeFileSync(path,JSON.stringify(result,null,1)+'\n');
+ console.log('Updated',result.length,'hubs,',result.reduce((n,h)=>n+h.folders.length,0),'folders');
 }
