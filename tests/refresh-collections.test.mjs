@@ -44,12 +44,12 @@ test('Updater is idempotent and never restores old cover URLs',()=>{
  assert.ok(!JSON.stringify(a).includes('jssantogit/nuvio-covers/'));
 });
 
-test('Refresh retains optional AIO episode catalogs and changes only TMDB date filters',()=>{
+test('Refresh preserves clean fallback without unsupported addon sources',()=>{
  const data=refreshCollections(copy(),'2027-04-05');
  const seasonal=folder(data,'hub-anime','anime-current-season');
- assert(seasonal.sources.some(s=>s.provider==='addon'&&s.catalogId==='seasonal'));
- assert.equal(seasonal.sources.find(s=>s.provider==='tmdb').filters.releaseDateGte,'2027-04-01');
+ assert.equal(seasonal.sources.filter(s=>s.provider==='addon').length,0);
+ assert.equal(seasonal.sources[0].filters.releaseDateGte,'2027-04-01');
  const upcoming=folder(data,'hub-anime','anime-upcoming');
- assert(upcoming.sources.some(s=>s.provider==='addon'&&s.catalogId==='seasonal'));
- assert(upcoming.sources.filter(s=>s.provider==='tmdb').every(s=>s.filters.releaseDateGte==='2027-04-06'));
+ assert.equal(upcoming.sources.filter(s=>s.provider==='addon').length,0);
+ assert(upcoming.sources.every(s=>s.filters.releaseDateGte==='2027-04-06'));
 });
