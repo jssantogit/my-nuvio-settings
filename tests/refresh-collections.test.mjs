@@ -24,7 +24,7 @@ test('Other Asian premieres contain four non-Korean countries, while tvN stays i
  const f=folder(d,'hub-asia','asia-new-dramas');
  assert.equal(f.sources.length,4);
  for(const s of f.sources){
-  assert.equal(s.filters.voteCountGte,null);
+  assert.equal(s.filters.voteCountGte,3);
   assert.equal(s.filters.withGenres,null);
   assert.equal(s.filters.releaseDateLte,'2027-01-05');
  }
