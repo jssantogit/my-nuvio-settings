@@ -8,7 +8,8 @@ on:
     paths:
       - collections.json
       - scripts/refresh-collections.mjs
-      - tests/refresh-collections.test.mjs
+      - 'tests/*.test.mjs'
+      - scripts/enhance-collections.mjs
       - .github/workflows/refresh-collections.yml
 
 permissions:
