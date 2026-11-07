@@ -10,7 +10,7 @@ Na página de [coleções do Nuvio](https://nuvio.tv/account?tab=collections), u
 
 ## Organização
 
-- `collections.json` — 13 categorias principais, 173 subcoleções e 736 fontes, com datas iniciais de 01/11/2026.
+- `collections.json` — 13 categorias principais, 172 subcoleções e 735 fontes, com janelas de estreia atualizadas em 07/11/2026.
 - `covers/` — capas e fundos existentes; os caminhos e nomes foram preservados.
 - `scripts/refresh-collections.mjs` — renova datas de temporada, recentes e próximos lançamentos.
 - `tests/` — testes de regressão dos filtros e estrutura.
@@ -33,14 +33,14 @@ Categorias de anime exibem títulos curtos (por exemplo, `Shounen`, `Seinen`, `S
 
 Leia [Integrações](./docs/INTEGRACOES.md) para habilitar fontes externas opcionais, se elas passarem a constar do seu manifesto.
 
-### Principais melhorias
+### Critérios atuais de lançamentos
 
-- Estreias de anime e doramas asiáticos com janelas temporais e sem bloqueio por votos mínimos.
-- Seção específica de novos doramas (Coreia, Japão, China, Taiwan, Tailândia e tvN) e novos animes.
-- Temporada de anime calculada por trimestre; futuros lançamentos começam após a data atual.
-- Renomeadas seções cujo título prometia atualidade ou ranking semanal não comprovado.
-- Catálogos de episódios de addons passam a ser opcionais e só podem ser adicionados após validar o manifesto real da instalação.
-- Nenhum `catalogId` de demografia foi inventado; os rótulos visuais continuam curtos e as ressalvas ficam na documentação.
-- URLs das capas do antigo `nuvio-covers` trocadas pelas imagens existentes neste repositório.
+- **Lançamentos recentes:** mantém ordenação por data de estreia e utiliza apenas um piso leve de votos no TMDB: filmes ≥10, séries e documentários ≥5, animes ≥3. Não confundir com uma nota mínima de avaliação.
+- **Animes da temporada:** uma única pasta reúne destaques do trimestre, estreias recentes, filmes e melhores avaliados; a duplicação entre `Novos animes` e `Temporada de anime atual` foi eliminada sem perder suas fontes.
+- **K-dramas:** obras coreanas, incluindo uma aba `tvN · recentes`, concentradas na pasta `K-dramas`.
+- **Outros:** novidades japonesas, chinesas, taiwanesas e tailandesas. Sem capa e sem logo coreano.
+- **Lançamentos de nicho:** usam mínimo de 3 votos (séries asiáticas e animes), e 5 em filmes de anime, para reduzir ruído sem excluir tudo que ainda está ganhando reconhecimento.
+- **Atualização:** as datas e os critérios são mantidos por `scripts/refresh-collections.mjs`. O GitHub atualiza o JSON mensalmente, mas é preciso reimportar no Nuvio.
+- Os catálogos adicionais de addons continuam condicionados ao manifesto instalado e não fazem parte do JSON padrão sem validação.
 
-> A TMDB usa principalmente a **primeira data de estreia da série**, não o calendário de temporadas/episódios novos. Consulte [CURADORIA](./docs/CURADORIA.md) para limites e possíveis melhorias futuras.
+> Uma pequena contagem mínima de votos melhora o sinal de reconhecimento, mas não garante qualidade, relevância editorial nem disponibilidade em streaming. A TMDB usa `first_air_date` de séries, não o calendário completo de novas temporadas/episódios. Consulte [CURADORIA](./docs/CURADORIA.md).
