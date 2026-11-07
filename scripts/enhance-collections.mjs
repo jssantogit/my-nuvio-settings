@@ -49,7 +49,7 @@ export function enhanceCollections(data,options={}) {
   attach(folder('hub-anime','anime-popular'),aioId,'anime','anilist.trending');
  for(const [catalog,title] of [['recently-aired','Recém-exibidos'],['latest-episodes','Últimos episódios'],['airing-today','Hoje']]){
   if(available(anime,animeId,'series',catalog)){
-   const f=ensureFolder('hub-anime','anime-episode-schedule','Episódios de anime','anime-new-releases');
+   const f=ensureFolder('hub-anime','anime-episode-schedule','Episódios de anime','anime-current-season');
    attach(f,animeId,'series',catalog);
   }
  }
